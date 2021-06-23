@@ -212,7 +212,7 @@ public class RJava {
         re.eval("df <- data");
         re.eval("df$genes <- rownames(df)");
         re.eval("matrix.m <- melt(df, id=c(\"genes\"))");
-        re.eval("matrix.m$genes <- factor(matrix.m$genes, levels=matrix.m[order(matrix.m$value, decreasing=TRUE), \"genes\"])");
+        re.eval("matrix.m$genes <- factor(matrix.m$genes, levels=unique(matrix.m[order(matrix.m$value, decreasing=TRUE), \"genes\"]))");//cheng@20210623 add unique
         re.eval("range <- range(matrix.m$value)");
         //re.eval("pdf(file=" + write_1 + ", width=4, height=2.3);");
         //re.eval("figure <- ggplot(matrix.m, aes(variable, genes)) + geom_tile(aes(fill = value), colour = \"black\") + scale_fill_gradient2(\"log2(total flow)\", limits=range, low=\"white\", high=\"red\", guide=\"colorbar\") + theme_bw() + xlab(\"\") + ylab(\"\") + theme(panel.grid=element_blank(), panel.border=element_blank(),legend.position=\"top\", legend.direction=\"horizontal\") + theme(axis.text.x = element_text(size=rel(0.75), angle=45, hjust=1), axis.text.y = element_text(size = rel(0.85), angle = 00))  + coord_flip() + ggtitle("+"\'"+title+"\'"+")");
@@ -233,7 +233,7 @@ public class RJava {
         String title = type;
         re.eval("df <- read.table(" + file + ", sep='\t', header = TRUE)");
         re.eval("matrix.m <- melt(df, id=c('gene'))");
-        re.eval("matrix.m$gene <- factor(matrix.m$gene, levels=matrix.m[order(matrix.m$value, decreasing=FALSE), 'gene'])");
+        re.eval("matrix.m$gene <- factor(matrix.m$gene, levels=unique(matrix.m[order(matrix.m$value, decreasing=FALSE), 'gene']))");//cheng@20210623 add unique
         re.eval("range <- range(matrix.m$value)");
         re.eval("pdf(file=" + write_1 + ", width=2.3, height=3.5);");
         re.eval("figure <- ggplot(matrix.m, aes(variable, gene)) + geom_tile(aes(fill = value), colour = \"black\") + scale_fill_gradient2(\"flow\ndifference\", limits=range, low=\"blue\", high=\"red\", guide=\"colorbar\") + theme_bw() + xlab(\"\") + ylab(\"\") + theme(legend.key.size = unit(0.3, \"cm\"), panel.grid=element_blank(), panel.border=element_blank(),legend.position=\"right\", legend.direction=\"vertical\") + theme(axis.text.x = element_text(size=rel(0.75), angle=45, hjust=1), axis.text.y = element_text(size = rel(0.75), angle = 00)) + ggtitle("+"\'"+title+"\'"+")");
@@ -442,7 +442,7 @@ public class RJava {
 
             bw.write("df <- read.table(" + file + ", sep='\t', header = TRUE); \n");
             bw.write("matrix.m <- melt(df, id=c('gene')); \n");
-            bw.write("matrix.m$gene <- factor(matrix.m$gene, levels=matrix.m[order(matrix.m$value, decreasing=FALSE), 'gene']); \n");
+            bw.write("matrix.m$gene <- factor(matrix.m$gene, levels=unique(matrix.m[order(matrix.m$value, decreasing=FALSE), 'gene'])); \n");//cheng@20210623 add unique
             bw.write("range <- range(matrix.m$value); \n");
             bw.write("pdf(file=" + write_1 + ", width=2.3, height=3.5);\n");
             bw.write("figure <- ggplot(matrix.m, aes(variable, gene)) + geom_tile(aes(fill = value), colour = \"black\") + scale_fill_gradient2(\"flow\ndifference\", limits=range, low=\"blue\", high=\"red\", guide=\"colorbar\") + theme_bw() + xlab(\"\") + ylab(\"\") + theme(legend.key.size = unit(0.3, \"cm\"), panel.grid=element_blank(), panel.border=element_blank(),legend.position=\"right\", legend.direction=\"vertical\") + theme(axis.text.x = element_text(size=rel(0.75), angle=45, hjust=1), axis.text.y = element_text(size = rel(0.75), angle = 00)) + ggtitle(" + "\'" + title + "\'" + "); \n");
@@ -539,7 +539,7 @@ public class RJava {
             bw.write("matrix <- data.frame(gene=rownames(matrix), matrix); \n");
             bw.write("matrix.m <- melt(matrix, id.var='gene'); \n");
             bw.write("matrix.m <- na.omit(matrix.m); \n");
-            bw.write("matrix.m$gene <- factor(matrix.m$gene, levels=matrix.m$gene); \n");
+            bw.write("matrix.m$gene <- factor(matrix.m$gene, levels=unique(matrix.m$gene)); \n");//cheng@20210623 add unique
             bw.write("matrix.m$variable <- factor(matrix.m$variable, levels=rev(levels(matrix.m$gene))); \n");
             bw.write("matrix.m <- ddply(matrix.m, .(variable), transform, rescale = value); \n");
             bw.write("w=dim(matrix)[1] / 2.5; \n");
@@ -779,7 +779,9 @@ public class RJava {
             //bw.write("flows.m <- flows.m[order(flows.m$"+disease+", decreasing=TRUE),]; \n");
             bw.write("flows.m$edges = rownames(flows.m); \n");
             bw.write("flows.m <- melt(flows.m, id.var='edges'); \n");
-            bw.write("flows.m$edges <- factor(flows.m$edges, levels=flows.m$edges); \n");
+//            bw.write("flows.m$edges <- factor(flows.m$edges, levels=flows.m$edges); \n");
+            bw.write("flows.m$edges <- factor(flows.m$edges, levels=unique(flows.m$edges)); \n");
+            //zc@2020028, make levels unique to work with newer R versions
             bw.write("colls <- c('#BDC9E1', '#67A9CF', '#1C9099', '#016C59', '#0023a0', '#f9a635', 'red', 'black'); \n");
             bw.write("pdf(file=" + write_1 + ", width=5, height=3); \n");
             //bw.write("pdf(file=" + write_1 + ", width=2.5, height=5); \n");
